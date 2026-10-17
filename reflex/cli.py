@@ -210,6 +210,24 @@ def status(run: str = typer.Option(..., "--run")):
 
 
 @app.command()
+def ui(
+    port: int = typer.Option(8765),
+    run: Optional[str] = typer.Option(None, "--run", help="open this run directly"),
+    no_open: bool = typer.Option(False, "--no-open", help="don't open a browser"),
+    build_only: bool = typer.Option(False, "--build-only", help="just write runs/index.html + view.html files"),
+):
+    """Local dashboard: every run's spec, metrics, label gallery, eval frames, replay, stress."""
+    from .ui import build_index, serve
+    from .utils import runs_dir
+
+    load_env()
+    if build_only:
+        console.print(f"wrote {build_index(runs_dir())}")
+        return
+    serve(port=port, open_browser=not no_open, run=run)
+
+
+@app.command()
 def dummy(
     name: str = typer.Option(..., "--name"),
     classes: str = typer.Option(..., help="comma-separated, e.g. rock,paper,scissors,none"),

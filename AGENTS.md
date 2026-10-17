@@ -48,7 +48,8 @@ Optional: `reflex stress --run rps` → exit 2 `kind: agent_plan`: read
 
 One-shot: `reflex run data/rps --name rps --query "..." --draft draft.json` (still stops at spec
 with exit 2 if questions are blocking; `--yes` accepts defaults). `reflex status --run rps`
-lists finished stages.
+lists finished stages. `reflex ui --run rps` opens a local dashboard to show the user
+the labels, held-out eval frames (student vs teacher, disagreements first) and stress results.
 
 ## Reading the results (`runs/<run>/results/eval.json`)
 - `agreement` / `macro_f1`: student vs teacher on held-out frames (split by episode or time,

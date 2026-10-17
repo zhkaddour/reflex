@@ -5,6 +5,7 @@ Uses the exported ONNX through the real runtime `Skill`, so the numbers are what
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 import cv2
@@ -160,6 +161,11 @@ def evaluate(run: Path, human_check: int = 0) -> dict:
         contact_sheet([(Path(d["path"]), f"T:{d['teacher']} S:{d['student']} {d['student_conf']:.2f}")
                        for d in disagreements], run / "disagreements.png", cols=4)
     _confusion_png(cm, classes, run / "confusion.png")
+    (run / "predictions.jsonl").write_text("".join(json.dumps({
+        "frame_id": d["frame_id"], "path": d["path"], "episode": d["episode"], "t_sec": d["t_sec"],
+        "student": classes[s_top[i]], "student_conf": round(float(P[i, s_top[i]]), 4),
+        "teacher": classes[t_top[i]], "teacher_conf": round(float(T[i, t_top[i]]), 4), "ms": ms[i],
+    }) + "\n" for i, d in enumerate(test)))
     demo = _demo_frames(run, test, classes, P, T, ms)
 
     metrics = {

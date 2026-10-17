@@ -52,6 +52,8 @@ reflex eval --run rps
 reflex export --run rps
 ```
 
+Browse every run (spec, metrics, labels, eval frames, disagreements, stress) with `reflex ui`.
+
 Or just ask Claude Code: *"use reflex to train a rock-paper-scissors skill from data/rps"*.
 
 ## Using a skill
@@ -94,5 +96,6 @@ reflex train --run shapes && reflex eval --run shapes && reflex export --run sha
 | `reflex export --run <r>` | `skills/<name>/` |
 | `reflex run <dir> --name <n> --query "..."` | end to end |
 | `reflex status --run <r>` | stage overview |
+| `reflex ui [--run <r>]` | local dashboard (http://localhost:8765): metrics, label gallery, student-vs-teacher eval frames with replay, stress |
 
 Exit codes: `0` ok, `2` needs input, `1` error. Each stage writes `runs/<run>/results/<stage>.json`.
