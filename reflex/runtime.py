@@ -95,7 +95,12 @@ def parse_decision(resp, spec: dict) -> tuple[dict[str, float], dict]:
     resp = _as_dict(resp)
     classes = spec_classes(spec)
     a = _as_dict(resp["answers"][0])
-    if spec["question"]["type"] == "predicate":
+    refused = a.get("type") == "refusal"
+    if refused:
+        # No answer: uniform (so it is down-weighted as low-confidence), ties go to background.
+        bg = background_class(spec)
+        probs = {c: (1.01 if c == bg else 1.0) / (len(classes) + 0.01) for c in classes}
+    elif spec["question"]["type"] == "predicate":
         p = float(a.get("probability", 1.0 if a.get("value") in (True, "yes") else 0.0))
         probs = {"no": 1 - p, "yes": p}
     else:
@@ -114,7 +119,7 @@ def parse_decision(resp, spec: dict) -> tuple[dict[str, float], dict]:
         probs = {c: v / total for c, v in probs.items()}
     usage = _as_dict(resp.get("usage") or {}) if resp.get("usage") is not None else {}
     return probs, {"input_tokens": int(usage.get("input_tokens") or 0),
-                   "output_tokens": int(usage.get("output_tokens") or 0)}
+                   "output_tokens": int(usage.get("output_tokens") or 0), "refused": refused}
 
 
 def _result(classes, probs, ms) -> dict:
