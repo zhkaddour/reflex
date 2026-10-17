@@ -1,0 +1,129 @@
+{
+  "run": "shapes",
+  "classes": [
+    "circle",
+    "square",
+    "triangle",
+    "none"
+  ],
+  "metrics": {
+    "agreement": 1.0,
+    "macro_f1": 1.0,
+    "agreement_on_confident": 1.0,
+    "p50_ms": 5.47,
+    "p95_ms": 7.8,
+    "teacher_p50_ms": 421.1,
+    "teacher_p95_ms": 514.7,
+    "speedup": 76.9,
+    "size_mb": 6.11,
+    "teacher_usd_per_1000": null,
+    "student_usd_per_1000": 0.0,
+    "n_test": 80,
+    "split_method": "episode"
+  },
+  "per_class": {
+    "circle": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 24
+    },
+    "square": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 24
+    },
+    "triangle": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 16
+    },
+    "none": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 16
+    }
+  },
+  "confusion": [
+    [
+      24,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      24,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      16,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      16
+    ]
+  ],
+  "disagreements": [],
+  "train": {
+    "stage": "train",
+    "status": "ok",
+    "backbone": "mobilenetv3_small_100",
+    "classes": [
+      "circle",
+      "square",
+      "triangle",
+      "none"
+    ],
+    "input_size": [
+      224,
+      224
+    ],
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "feat_dim": 1024,
+    "hidden": 0,
+    "epochs": 300,
+    "aug": 2,
+    "finetuned": false,
+    "device": "mps",
+    "split_method": "episode",
+    "n_train": 240,
+    "n_test": 80,
+    "n_gap": 0,
+    "train_class_counts": {
+      "circle": 32,
+      "square": 63,
+      "triangle": 71,
+      "none": 74
+    },
+    "test_class_counts": {
+      "none": 16,
+      "circle": 24,
+      "square": 24,
+      "triangle": 16
+    },
+    "final_loss": 0.4873,
+    "head_train_s": 1.33,
+    "train_agreement": 1.0,
+    "test_agreement_quick": 1.0,
+    "onnx_max_abs_diff": 6.668706646451028e-06,
+    "export_s": 0.6,
+    "size_mb": 6.11,
+    "total_s": 4.1
+  },
+  "labels": {}
+}

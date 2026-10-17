@@ -1,5 +1,5 @@
 """`reflex` CLI. Every command is non-interactive, prints a short summary, writes a JSON
-result into the run folder, and exits 0 (ok), 2 (needs user/agent input) or 1 (error)."""
+result to runs/<run>/results/<stage>.json, and exits 0 (ok), 2 (needs user/agent input) or 1 (error)."""
 
 from __future__ import annotations
 
@@ -18,9 +18,9 @@ app = typer.Typer(add_completion=False, no_args_is_help=True,
 
 
 def _guard(stage: str, run: Optional[str], fn: Callable[[], dict]):
-    """Run a stage, write runs/<run>/<stage>.json, map errors to exit codes."""
+    """Run a stage, write runs/<run>/results/<stage>.json, map errors to exit codes."""
     load_env()
-    out_path = run_dir(run, create=True) / f"{stage}.json" if run else None
+    out_path = run_dir(run, create=True) / "results" / f"{stage}.json" if run else None
     try:
         result = {"stage": stage, "status": "ok", **fn()}
         code = 0
@@ -202,7 +202,7 @@ def status(run: str = typer.Option(..., "--run")):
         d = run_dir(run)
         stages = {}
         for s in ["ingest", "spec", "spec_check", "label", "train", "eval", "stress", "export"]:
-            p = d / f"{s}.json"
+            p = d / "results" / f"{s}.json"
             stages[s] = json.loads(p.read_text())["status"] if p.exists() else "todo"
         return {"run": run, "stages": stages}
 

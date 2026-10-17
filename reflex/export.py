@@ -60,7 +60,7 @@ def make_student(backbone, head):
 
 
 def export_onnx(model, input_size, path: Path) -> float:
-    """torch -> ONNX (opset 17, dynamic batch). Returns max |onnx - torch| on random input."""
+    """torch -> ONNX (opset 17, dynamic batch). Returns max relative |onnx - torch| on random input."""
     import onnxruntime as ort
     import torch
 
@@ -71,16 +71,21 @@ def export_onnx(model, input_size, path: Path) -> float:
     kw = dict(input_names=["image"], output_names=["logits"], opset_version=17,
               dynamic_axes={"image": {0: "batch"}, "logits": {0: "batch"}})
     try:
-        torch.onnx.export(model, (x,), str(path), dynamo=False, **kw)
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            torch.onnx.export(model, (x,), str(path), dynamo=False, **kw)
     except TypeError:  # older torch without the dynamo kwarg
         torch.onnx.export(model, (x,), str(path), **kw)
     with torch.no_grad():
         ref = model(x).numpy()
     sess = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
     out = sess.run(None, {"image": x.numpy()})[0]
-    diff = float(np.abs(out - ref).max())
-    if diff > 1e-3:
-        raise ReflexError(f"ONNX output differs from torch by {diff:.2e}")
+    # Relative: noise input can push logits to ~1e4 where float32 rounding alone is ~1e-3.
+    diff = float(np.abs(out - ref).max() / (1.0 + np.abs(ref).max()))
+    if diff > 1e-4:
+        raise ReflexError(f"ONNX output differs from torch (relative error {diff:.2e})")
     return diff
 
 
@@ -124,7 +129,7 @@ def build_student(run: Path) -> dict:
     t0 = time.time()
     diff = export_onnx(make_student(backbone, head), cfg["input_size"], out / "model.onnx")
     write_skill(out, name=run.name, classes=train["classes"], cfg=cfg, backbone=train["backbone"], spec=spec)
-    return {"onnx_max_abs_diff": diff, "export_s": round(time.time() - t0, 1),
+    return {"onnx_rel_err": diff, "export_s": round(time.time() - t0, 1),
             "size_mb": round((out / "model.onnx").stat().st_size / 1e6, 2)}
 
 
@@ -144,7 +149,7 @@ def export_skill(run: Path, name: str | None = None) -> dict:
     copy_runtime(dst)
     copied = []
     for f in ["report.md", "report.json", "confusion.png", "disagreements.png",
-              "stress.md", "stress.json", "stress.png"]:
+              "stress.md", "stress_report.json", "stress.png"]:
         if (run / f).exists():
             shutil.copy(run / f, dst / f)
             copied.append(f)
@@ -179,5 +184,5 @@ def dummy_skill(name: str, classes: list[str]) -> dict:
     write_skill(dst, name=name, classes=classes, cfg=cfg, backbone=DEFAULT_BACKBONE, spec=spec,
                 extra={"dummy": True})
     copy_runtime(dst)
-    return {"skill_dir": str(dst), "classes": classes, "dummy": True, "onnx_max_abs_diff": diff,
+    return {"skill_dir": str(dst), "classes": classes, "dummy": True, "onnx_rel_err": diff,
             "size_mb": round((dst / "model.onnx").stat().st_size / 1e6, 2)}

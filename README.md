@@ -95,4 +95,4 @@ reflex train --run shapes && reflex eval --run shapes && reflex export --run sha
 | `reflex run <dir> --name <n> --query "..."` | end to end |
 | `reflex status --run <r>` | stage overview |
 
-Exit codes: `0` ok, `2` needs input, `1` error. Each stage writes `runs/<run>/<stage>.json`.
+Exit codes: `0` ok, `2` needs input, `1` error. Each stage writes `runs/<run>/results/<stage>.json`.

@@ -150,7 +150,7 @@ def train_head(X, Y, W, hidden: int, epochs: int, seed: int = 0):
             opt.step()
         sched.step()
     head.eval()
-    return head, float(loss)
+    return head, float(loss.detach())
 
 
 def finetune_backbone(run, backbone, head, data, train_ids, cfg, dev, hflip_ok, epochs: int, unfreeze_frac: float = 0.3):

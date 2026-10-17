@@ -128,9 +128,11 @@ def _fold_answers(spec: dict, questions: list[dict], answers: dict) -> dict:
 def spec(run: Path, query: str | None = None, draft: Path | None = None, answers: Path | None = None,
          n_samples: int = 8, force_llm: bool = False, accept: bool = False) -> dict:
     prev = read_json(run / "spec.json", default={})
-    query = query or prev.get("query")
+    qfile = run / "query.txt"
+    query = query or prev.get("query") or (qfile.read_text().strip() if qfile.exists() else None)
     if not query:
         raise ReflexError("--query is required the first time")
+    qfile.write_text(query)
     ans = {**prev.get("answers", {}), **_load_answers(answers)}
     use_llm = force_llm or bool(llm_model())
 

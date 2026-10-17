@@ -10,14 +10,14 @@ milliseconds on CPU) and a report comparing it with the teacher.
 decision it writes files and exits with **code 2**; you read the JSON result, do the step, re-run.
 
 - Exit codes: `0` ok · `2` needs input (you or the user) · `1` error (read `message`).
-- Every command writes `runs/<run>/<stage>.json` (`status`, numbers, file paths). Read that,
+- Every command writes `runs/<run>/results/<stage>.json` (`status`, numbers, file paths). Read that,
   not the console log.
 - Needs `OPENAI_API_KEY` in `.env` (teacher). No other LLM key is needed in agent mode.
 
 ## Steps
 
 ```bash
-reflex ingest data/rps --run rps            # frames + time/cost estimate (estimate.json)
+reflex ingest data/rps --run rps            # frames + time/cost estimate (results/ingest.json)
 reflex spec --run rps --query "is the hand showing rock, paper or scissors?"   # exit 2, kind=agent_draft
 ```
 
@@ -50,7 +50,7 @@ One-shot: `reflex run data/rps --name rps --query "..." --draft draft.json` (sti
 with exit 2 if questions are blocking; `--yes` accepts defaults). `reflex status --run rps`
 lists finished stages.
 
-## Reading the results (`runs/<run>/eval.json`)
+## Reading the results (`runs/<run>/results/eval.json`)
 - `agreement` / `macro_f1`: student vs teacher on held-out frames (split by episode or time,
   never random — so the numbers are honest).
 - `p50_ms` vs `teacher_p50_ms`, `speedup`, `size_mb`, `teacher_usd_per_1000`.
@@ -63,7 +63,7 @@ lists finished stages.
 | one class has low recall / few examples | record more footage of that class (check `train.json` `train_class_counts`) |
 | agreement < ~85% with balanced data | `--backbone efficientnet_b0` or `vit_small_patch14_dinov2.lvd142m`; `--hidden 256`; `--finetune` |
 | model reacts too late to an action | `reflex label --propagate-back 3` then retrain |
-| stress shows big drops | capture footage matching the `suggestions` in stress.json |
+| stress shows big drops | capture footage matching the `suggestions` in results/stress.json |
 | `split failed` | need more frames or more than one episode |
 
 ## Using a skill in an app

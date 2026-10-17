@@ -10,7 +10,7 @@ from .utils import console, read_json, run_dir, write_json
 def _stage(run: Path, name: str, fn, **kw) -> dict:
     console.rule(f"[bold]{name}")
     result = {"stage": name, "status": "ok", **fn(**kw)}
-    write_json(run / f"{name}.json", result)
+    write_json(run / "results" / f"{name}.json", result)
     return result
 
 

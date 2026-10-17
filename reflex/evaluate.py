@@ -13,7 +13,7 @@ import numpy as np
 from .runtime import Skill
 from .spec import contact_sheet
 from .train import load_dataset
-from .utils import NeedsInput, ReflexError, console, load_spec, pctl, read_json, read_jsonl, write_json
+from .utils import NeedsInput, ReflexError, console, load_spec, pctl, price_usd, read_json, read_jsonl, write_json
 
 N_WORST = 12
 
@@ -130,7 +130,8 @@ def evaluate(run: Path, human_check: int = 0) -> dict:
     labels = list(range(len(classes)))
 
     acc = float((s_top == t_top).mean())
-    f1 = float(f1_score(t_top, s_top, labels=labels, average="macro", zero_division=0))
+    present = sorted(set(t_top.tolist()) | set(s_top.tolist()))  # classes absent from test don't count
+    f1 = float(f1_score(t_top, s_top, labels=present, average="macro", zero_division=0))
     prec, rec, _, sup = precision_recall_fscore_support(t_top, s_top, labels=labels, zero_division=0)
     cm = confusion_matrix(t_top, s_top, labels=labels)
     teacher_rows = [r for r in read_jsonl(run / "labels.jsonl") if r.get("source") == "teacher"]
@@ -142,6 +143,10 @@ def evaluate(run: Path, human_check: int = 0) -> dict:
     t_p50, t_p95 = (pctl(t_lat, 50), pctl(t_lat, 95)) if t_lat else (lab.get("teacher_p50_ms"), lab.get("teacher_p95_ms"))
     s_p50, s_p95 = pctl(ms, 50), pctl(ms, 95)
     size_mb = (run / "student" / "model.onnx").stat().st_size / 1e6
+    usd_1000 = lab.get("usd_per_1000_frames")
+    if usd_1000 is None and teacher_rows:
+        usd_1000 = round(price_usd(np.mean([r.get("input_tokens", 0) for r in teacher_rows]),
+                                   np.mean([r.get("output_tokens", 0) for r in teacher_rows])) * 1000, 3)
 
     # Worst disagreements: student confidently wrong where the teacher was confident.
     wrong = np.where(s_top != t_top)[0]
@@ -150,6 +155,7 @@ def evaluate(run: Path, human_check: int = 0) -> dict:
     disagreements = [{"frame_id": test[i]["frame_id"], "path": str(run / test[i]["path"]),
                       "teacher": classes[t_top[i]], "teacher_conf": round(float(T[i, t_top[i]]), 3),
                       "student": classes[s_top[i]], "student_conf": round(float(P[i, s_top[i]]), 3)} for i in worst]
+    (run / "disagreements.png").unlink(missing_ok=True)
     if disagreements:
         contact_sheet([(Path(d["path"]), f"T:{d['teacher']} S:{d['student']} {d['student_conf']:.2f}")
                        for d in disagreements], run / "disagreements.png", cols=4)
@@ -162,7 +168,7 @@ def evaluate(run: Path, human_check: int = 0) -> dict:
         "p50_ms": round(s_p50, 2), "p95_ms": round(s_p95, 2),
         "teacher_p50_ms": round(t_p50, 1) if t_p50 else None, "teacher_p95_ms": round(t_p95, 1) if t_p95 else None,
         "speedup": round(t_p50 / s_p50, 1) if t_p50 else None,
-        "size_mb": round(size_mb, 2), "teacher_usd_per_1000": lab.get("usd_per_1000_frames"), "student_usd_per_1000": 0.0,
+        "size_mb": round(size_mb, 2), "teacher_usd_per_1000": usd_1000, "student_usd_per_1000": 0.0,
         "n_test": len(test), "split_method": sp["method"],
     }
     per_class = {c: {"precision": round(float(prec[i]), 3), "recall": round(float(rec[i]), 3), "support": int(sup[i])}
@@ -183,7 +189,7 @@ def evaluate(run: Path, human_check: int = 0) -> dict:
                   f"student {s_p50:.1f} ms vs teacher {t_p50 or float('nan'):.0f} ms"
                   + (f" → {metrics['speedup']}× faster" if metrics["speedup"] else "") + f", {size_mb:.1f} MB")
     summary = {"report": str(run / "report.md"), "report_json": str(run / "report.json"),
-               "confusion": str(run / "confusion.png"), "disagreements_png": str(run / "disagreements.png"),
+               "confusion": str(run / "confusion.png"), "disagreements_png": str(run / "disagreements.png") if disagreements else None,
                **demo,
                **metrics, "per_class": per_class}
     hc = report.get("human_check")
