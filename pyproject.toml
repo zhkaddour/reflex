@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reflex"
+version = "0.1.0"
+description = "Big models teach. Small models react. Turn a sentence + video into a tiny on-device perception model."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "openai>=1.60",
+  "httpx",
+  "torch",
+  "torchvision",
+  "timm",
+  "opencv-python",
+  "onnx",
+  "onnxruntime",
+  "numpy",
+  "pillow",
+  "scikit-learn",
+  "typer",
+  "rich",
+  "matplotlib",
+  "python-dotenv",
+]
+
+[project.scripts]
+reflex = "reflex.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["reflex*"]
+
+[tool.setuptools.package-data]
+reflex = ["prompts/*.md"]
