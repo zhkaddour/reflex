@@ -2,28 +2,56 @@
 
 **Big models teach. Small models react.**
 
-Reflex turns a sentence and a few minutes of video into a tiny, fast perception model that
-runs on the device. A big vision model (OpenAI **Decisions API**) is the *teacher*: the
-calling agent turns your vague request into a precise visual label spec, the teacher labels
-every frame, and Reflex trains a few-MB *student* (frozen pretrained backbone + small head
-on soft labels) that runs in milliseconds on a laptop CPU, then reports exactly how it
-compares with the teacher.
+Give Reflex a sentence and a few minutes of video. It hands back a **16 MB on-device vision model
+that answers in ~8 ms, offline, for $0 per frame**, trained by a cloud model that takes ~350 ms
+and costs money on every call.
+
+> *"push plastic bottles off the recycling belt"* → 1,500 frames labelled by the OpenAI
+> Decisions API for **$0.60** → a student that is **more accurate than its teacher** against
+> ground truth, and **~40× faster**.
+
+## Results
+
+| task | student vs teacher | student latency | teacher latency | cost / 1k frames |
+|---|---|---|---|---|
+| Conveyor: "is this a plastic bottle?" (synthetic belt, 1,500 frames) | 96% agreement | **8.5 ms** | 350 ms | **$0** vs $0.40 |
+| Real phone video: "is the MagSafe charger plugged in?" (864 frames) | 82% agreement | **7.5 ms** | 440 ms | **$0** vs $0.66 |
+
+Student latency is the fine-tuned efficientnet_b0 on an M-series Mac (ONNX Runtime + CoreML), p50 from each skill's report.
+The conveyor sim knows the truth, so we can score both models against it:
+
+| on clear test frames vs ground truth | precision | recall |
+|---|---|---|
+| teacher (Decisions API) | 0.91 | 0.80 |
+| **student (Reflex)** | **0.96** | **0.88** |
+
+**Why speed matters**: on the live belt, a general VLM (~2.6 s per frame) only keeps up at
+0.15 m/s and misses every bottle from 0.6 m/s. The Decisions API holds up to 1.2 m/s and
+collapses at 2.4 m/s. The student is limited only by the 30 fps camera.
+→ [examples/conveyor](examples/conveyor/README.md)
+
+## How it works
 
 ```
 videos + "vague query"
-  ├─ ingest   video → frames (fps sampling, resize) + measured time/cost estimate
-  ├─ spec     agent (or LLM) looks at sample frames → spec.json + clarifying questions
-  ├─ label    Decisions API labels every frame (soft labels, cached, resumable) [+ propagate-back]
-  ├─ train    frozen timm backbone + head, seconds on a Mac; split by episode/time (no leakage)
-  ├─ eval     student vs teacher: agreement, F1, latency, size, cost, disagreements, demo clip
-  ├─ stress   realistic perturbations → who breaks first (optional)
-  └─ export   skills/<name>/ → model.onnx + skill.json + predict.py + report
+  ├─ ingest   video → frames + measured time/$ estimate
+  ├─ spec     agent looks at sample frames → precise visual label spec (+ clarifying questions)
+  ├─ label    Decisions API labels every frame (soft labels, cached, resumable)
+  ├─ train    pretrained backbone + small head, minutes on a laptop; split by episode (no leakage)
+  ├─ eval     student vs teacher: agreement, F1, latency, size, cost, worst disagreements
+  ├─ stress   lighting / blur / noise / rotation / occlusion → who breaks first
+  └─ export   skills/<name>/ → model.onnx + skill.json + predict.py + report.md
 ```
 
+The whole lifecycle is a CLI built to be driven by a coding agent: just ask Claude Code or Codex
+*"use reflex to train a skill that tells me if the charger is plugged in, from data/plug"*.
+See [SKILL.md](SKILL.md) / [AGENTS.md](AGENTS.md). Exported skills with full reports:
+[skills/conveyor](skills/conveyor/report.md), [skills/plug](skills/plug/report.md)
+([stress test](skills/plug/stress.md)).
+
 Prior work: Edge Impulse shipped GPT-4o-labelled training data for small models in 2024.
-Reflex's difference is that an agent runs the *whole* lifecycle (spec → labels → model →
-eval → robustness), packaged as a CLI any coding agent (Claude Code, Codex) can drive.
-See [SKILL.md](SKILL.md) / [AGENTS.md](AGENTS.md).
+Reflex differs in that an agent runs the *whole* lifecycle (spec → labels → model → eval →
+robustness) and reports honestly where the student and teacher disagree.
 
 ## Setup (macOS, Apple Silicon)
 
@@ -80,6 +108,17 @@ python examples/make_synthetic.py data/shapes --fake-labels runs/shapes
 reflex train --run shapes && reflex eval --run shapes && reflex export --run shapes
 ```
 
+## Conveyor demo
+
+A synthetic recycling line where a VLM, the Decisions API and a Reflex student race to push plastic
+bottles off a belt in real time. The sim also produces the training footage (with ground truth).
+See [examples/conveyor/README.md](examples/conveyor/README.md).
+
+```bash
+reflex conveyor live          # three identical belts side by side at http://localhost:8766
+reflex conveyor bench         # max belt speed each brain sustains
+```
+
 ## Commands
 
 | Command | Does |
@@ -96,6 +135,7 @@ reflex train --run shapes && reflex eval --run shapes && reflex export --run sha
 | `reflex export --run <r>` | `skills/<name>/` |
 | `reflex run <dir> --name <n> --query "..."` | end to end |
 | `reflex status --run <r>` | stage overview |
+| `reflex conveyor sprites\|record\|live\|bench\|score` | conveyor demo (see examples/conveyor) |
 | `reflex ui [--run <r>]` | local dashboard (http://localhost:8765): metrics, label gallery, student-vs-teacher eval frames with replay, stress |
 
 Exit codes: `0` ok, `2` needs input, `1` error. Each stage writes `runs/<run>/results/<stage>.json`.

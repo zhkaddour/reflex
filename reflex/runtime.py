@@ -144,10 +144,21 @@ def _softmax(x: np.ndarray) -> np.ndarray:
     return e / e.sum(axis=-1, keepdims=True)
 
 
+def _providers(device: str | None) -> list[str]:
+    """'auto' (default): Apple's CoreML (Neural Engine/GPU) when onnxruntime has it, else CPU.
+    CoreML keeps the student fast even when the CPU is busy. Override: device='cpu' or REFLEX_DEVICE."""
+    import onnxruntime as ort
+
+    device = (device or os.environ.get("REFLEX_DEVICE") or "auto").lower()
+    if device in ("auto", "coreml") and "CoreMLExecutionProvider" in ort.get_available_providers():
+        return ["CoreMLExecutionProvider", "CPUExecutionProvider"]
+    return ["CPUExecutionProvider"]
+
+
 class Skill:
     """On-device student: model.onnx + skill.json."""
 
-    def __init__(self, path: str | os.PathLike, threads: int | None = None):
+    def __init__(self, path: str | os.PathLike, threads: int | None = None, device: str | None = None):
         import onnxruntime as ort
 
         self.path = Path(path)
@@ -159,8 +170,8 @@ class Skill:
         so = ort.SessionOptions()
         if threads:
             so.intra_op_num_threads = threads
-        self.session = ort.InferenceSession(str(self.path / "model.onnx"), so,
-                                            providers=["CPUExecutionProvider"])
+        self.session = ort.InferenceSession(str(self.path / "model.onnx"), so, providers=_providers(device))
+        self.device = "coreml" if "CoreMLExecutionProvider" in self.session.get_providers() else "cpu"
         self.input_name = self.session.get_inputs()[0].name
         self.predict(np.zeros((*self.input_size, 3), np.uint8))  # warm-up
 

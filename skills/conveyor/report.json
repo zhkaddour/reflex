@@ -1,0 +1,209 @@
+{
+  "run": "conveyor",
+  "classes": [
+    "no",
+    "yes"
+  ],
+  "metrics": {
+    "agreement": 0.96,
+    "macro_f1": 0.9224,
+    "agreement_on_confident": 0.9675,
+    "p50_ms": 8.48,
+    "p95_ms": 25.27,
+    "teacher_p50_ms": 346.9,
+    "teacher_p95_ms": 687.6,
+    "speedup": 40.9,
+    "size_mb": 16.03,
+    "teacher_usd_per_1000": 0.404,
+    "student_usd_per_1000": 0.0,
+    "n_test": 250,
+    "split_method": "episode"
+  },
+  "per_class": {
+    "no": {
+      "precision": 0.981,
+      "recall": 0.972,
+      "support": 213
+    },
+    "yes": {
+      "precision": 0.846,
+      "recall": 0.892,
+      "support": 37
+    }
+  },
+  "confusion": [
+    [
+      207,
+      6
+    ],
+    [
+      4,
+      33
+    ]
+  ],
+  "disagreements": [
+    {
+      "frame_id": "ep009__00090",
+      "path": "runs/conveyor/frames/ep009__00090.jpg",
+      "teacher": "no",
+      "teacher_conf": 1.0,
+      "student": "yes",
+      "student_conf": 0.95
+    },
+    {
+      "frame_id": "ep009__00098",
+      "path": "runs/conveyor/frames/ep009__00098.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.78,
+      "student": "no",
+      "student_conf": 0.946
+    },
+    {
+      "frame_id": "ep003__00048",
+      "path": "runs/conveyor/frames/ep003__00048.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.95,
+      "student": "no",
+      "student_conf": 0.759
+    },
+    {
+      "frame_id": "ep003__00050",
+      "path": "runs/conveyor/frames/ep003__00050.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.72,
+      "student": "no",
+      "student_conf": 0.966
+    },
+    {
+      "frame_id": "ep009__00070",
+      "path": "runs/conveyor/frames/ep009__00070.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.68,
+      "student": "yes",
+      "student_conf": 0.901
+    },
+    {
+      "frame_id": "ep009__00003",
+      "path": "runs/conveyor/frames/ep009__00003.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.63,
+      "student": "no",
+      "student_conf": 0.965
+    },
+    {
+      "frame_id": "ep009__00117",
+      "path": "runs/conveyor/frames/ep009__00117.jpg",
+      "teacher": "no",
+      "teacher_conf": 1.0,
+      "student": "yes",
+      "student_conf": 0.589
+    },
+    {
+      "frame_id": "ep009__00081",
+      "path": "runs/conveyor/frames/ep009__00081.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.56,
+      "student": "yes",
+      "student_conf": 0.736
+    },
+    {
+      "frame_id": "ep003__00096",
+      "path": "runs/conveyor/frames/ep003__00096.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.69,
+      "student": "yes",
+      "student_conf": 0.562
+    },
+    {
+      "frame_id": "ep009__00114",
+      "path": "runs/conveyor/frames/ep009__00114.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.56,
+      "student": "yes",
+      "student_conf": 0.631
+    }
+  ],
+  "train": {
+    "backbone": "efficientnet_b0",
+    "classes": [
+      "no",
+      "yes"
+    ],
+    "input_size": [
+      224,
+      224
+    ],
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "feat_dim": 1280,
+    "hidden": 0,
+    "epochs": 300,
+    "aug": 2,
+    "finetuned": true,
+    "device": "mps",
+    "split_method": "episode",
+    "n_train": 1250,
+    "n_test": 250,
+    "n_gap": 0,
+    "train_class_counts": {
+      "no": 1035,
+      "yes": 215
+    },
+    "test_class_counts": {
+      "no": 213,
+      "yes": 37
+    },
+    "final_loss": 0.1106,
+    "head_train_s": 36.02,
+    "onnx_rel_err": 1.1393293561923201e-06,
+    "export_s": 6.8,
+    "size_mb": 16.03,
+    "total_s": 310.7
+  },
+  "labels": {
+    "labelled": 1500,
+    "failed": 0,
+    "total_frames": 1500,
+    "teacher_distribution": {
+      "no": 1248,
+      "yes": 252
+    },
+    "final_distribution": {
+      "no": 1248,
+      "yes": 252
+    },
+    "propagate_back": 0,
+    "propagated": 0,
+    "min_conf": 0.6,
+    "low_conf": 12,
+    "low_conf_frames": [
+      "ep002__00119",
+      "ep005__00042",
+      "ep006__00062",
+      "ep006__00086",
+      "ep006__00115",
+      "ep007__00082",
+      "ep008__00008",
+      "ep009__00076",
+      "ep009__00079",
+      "ep009__00081",
+      "ep009__00114",
+      "ep011__00054"
+    ],
+    "teacher_p50_ms": 340.1,
+    "teacher_p95_ms": 644.2,
+    "input_tokens_per_frame": 404.0,
+    "output_tokens_per_frame": 0.0,
+    "usd_per_1000_frames": 0.404,
+    "usd_total_est": 0.606,
+    "labels": "runs/conveyor/labels_final.jsonl"
+  }
+}

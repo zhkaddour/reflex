@@ -1,0 +1,245 @@
+{
+  "run": "plug",
+  "classes": [
+    "no",
+    "yes"
+  ],
+  "metrics": {
+    "agreement": 0.8182,
+    "macro_f1": 0.8074,
+    "agreement_on_confident": 0.8381,
+    "p50_ms": 7.5,
+    "p95_ms": 9.05,
+    "teacher_p50_ms": 441.4,
+    "teacher_p95_ms": 972.5,
+    "speedup": 58.8,
+    "size_mb": 16.03,
+    "teacher_usd_per_1000": 0.659,
+    "student_usd_per_1000": 0.0,
+    "n_test": 110,
+    "split_method": "episode"
+  },
+  "per_class": {
+    "no": {
+      "precision": 0.806,
+      "recall": 0.906,
+      "support": 64
+    },
+    "yes": {
+      "precision": 0.842,
+      "recall": 0.696,
+      "support": 46
+    }
+  },
+  "confusion": [
+    [
+      58,
+      6
+    ],
+    [
+      14,
+      32
+    ]
+  ],
+  "disagreements": [
+    {
+      "frame_id": "IMG_7603__00007",
+      "path": "runs/plug/frames/IMG_7603__00007.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.99,
+      "student": "yes",
+      "student_conf": 0.873
+    },
+    {
+      "frame_id": "IMG_7603__00057",
+      "path": "runs/plug/frames/IMG_7603__00057.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.91,
+      "student": "no",
+      "student_conf": 0.868
+    },
+    {
+      "frame_id": "IMG_7603__00106",
+      "path": "runs/plug/frames/IMG_7603__00106.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.94,
+      "student": "yes",
+      "student_conf": 0.836
+    },
+    {
+      "frame_id": "IMG_7603__00012",
+      "path": "runs/plug/frames/IMG_7603__00012.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.87,
+      "student": "no",
+      "student_conf": 0.884
+    },
+    {
+      "frame_id": "IMG_7603__00099",
+      "path": "runs/plug/frames/IMG_7603__00099.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.72,
+      "student": "no",
+      "student_conf": 0.953
+    },
+    {
+      "frame_id": "IMG_7603__00050",
+      "path": "runs/plug/frames/IMG_7603__00050.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.92,
+      "student": "no",
+      "student_conf": 0.689
+    },
+    {
+      "frame_id": "IMG_7603__00035",
+      "path": "runs/plug/frames/IMG_7603__00035.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.84,
+      "student": "no",
+      "student_conf": 0.74
+    },
+    {
+      "frame_id": "IMG_7603__00032",
+      "path": "runs/plug/frames/IMG_7603__00032.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.86,
+      "student": "yes",
+      "student_conf": 0.702
+    },
+    {
+      "frame_id": "IMG_7603__00082",
+      "path": "runs/plug/frames/IMG_7603__00082.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.9,
+      "student": "no",
+      "student_conf": 0.644
+    },
+    {
+      "frame_id": "IMG_7603__00058",
+      "path": "runs/plug/frames/IMG_7603__00058.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.95,
+      "student": "no",
+      "student_conf": 0.6
+    },
+    {
+      "frame_id": "IMG_7603__00076",
+      "path": "runs/plug/frames/IMG_7603__00076.jpg",
+      "teacher": "yes",
+      "teacher_conf": 0.87,
+      "student": "no",
+      "student_conf": 0.642
+    },
+    {
+      "frame_id": "IMG_7603__00030",
+      "path": "runs/plug/frames/IMG_7603__00030.jpg",
+      "teacher": "no",
+      "teacher_conf": 0.77,
+      "student": "yes",
+      "student_conf": 0.707
+    }
+  ],
+  "train": {
+    "backbone": "efficientnet_b0",
+    "classes": [
+      "no",
+      "yes"
+    ],
+    "input_size": [
+      224,
+      224
+    ],
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "feat_dim": 1280,
+    "hidden": 0,
+    "epochs": 300,
+    "aug": 2,
+    "finetuned": false,
+    "device": "mps",
+    "split_method": "episode",
+    "n_train": 754,
+    "n_test": 110,
+    "n_gap": 0,
+    "train_class_counts": {
+      "no": 386,
+      "yes": 368
+    },
+    "test_class_counts": {
+      "yes": 46,
+      "no": 64
+    },
+    "final_loss": 0.2637,
+    "head_train_s": 4.55,
+    "train_agreement": 0.9231,
+    "test_agreement_quick": 0.8364,
+    "onnx_rel_err": 1.1798368859672337e-06,
+    "export_s": 1.1,
+    "size_mb": 16.03,
+    "total_s": 7.9
+  },
+  "labels": {
+    "labelled": 864,
+    "failed": 0,
+    "total_frames": 864,
+    "teacher_distribution": {
+      "yes": 414,
+      "no": 450
+    },
+    "final_distribution": {
+      "yes": 414,
+      "no": 450
+    },
+    "propagate_back": 0,
+    "propagated": 0,
+    "min_conf": 0.6,
+    "low_conf": 30,
+    "low_conf_frames": [
+      "IMG_7601__00002",
+      "IMG_7601__00065",
+      "IMG_7602__00012",
+      "IMG_7602__00039",
+      "IMG_7602__00052",
+      "IMG_7603__00013",
+      "IMG_7603__00023",
+      "IMG_7603__00025",
+      "IMG_7603__00028",
+      "IMG_7603__00037",
+      "IMG_7605__00027",
+      "IMG_7605__00039",
+      "IMG_7605__00064",
+      "IMG_7606__00003",
+      "IMG_7606__00008",
+      "IMG_7606__00013",
+      "IMG_7606__00023",
+      "IMG_7606__00042",
+      "IMG_7606__00046",
+      "IMG_7606__00057",
+      "IMG_7606__00085",
+      "IMG_7606__00087",
+      "IMG_7606__00112",
+      "IMG_7606__00137",
+      "IMG_7606__00154",
+      "IMG_7606__00169",
+      "IMG_7606__00171",
+      "IMG_7606__00186",
+      "IMG_7606__00205",
+      "IMG_7606__00259"
+    ],
+    "teacher_p50_ms": 441.4,
+    "teacher_p95_ms": 972.5,
+    "input_tokens_per_frame": 659.0,
+    "output_tokens_per_frame": 0.0,
+    "usd_per_1000_frames": 0.659,
+    "usd_total_est": 0.569,
+    "labels": "runs/plug/labels_final.jsonl"
+  }
+}

@@ -239,5 +239,131 @@ def dummy(
     _guard("dummy", None, lambda: dummy_skill(name, cls))
 
 
+# ---------------------------------------------------------------- conveyor demo
+
+conveyor = typer.Typer(no_args_is_help=True, help="Synthetic recycling conveyor: live model showdown + training data.")
+app.add_typer(conveyor, name="conveyor")
+
+BRAINS_HELP = ("comma-separated: vlm, decisions, student, oracle@<ms>; '@model' picks the model, ':<n>' requests "
+               "in flight, '~<k>' yes-votes per object before pushing (student defaults to 2), e.g. vlm:4,student~3")
+
+
+def _sprites(procedural: bool):
+    from .conveyor.sprites import load
+
+    return load(procedural=procedural)
+
+
+def _brains(names: str, spec: Optional[Path], skill: Path):
+    from .conveyor.brains import make_brain, resolve_spec
+
+    s = resolve_spec(spec, skill)
+    out = []
+    for n in [n.strip() for n in names.split(",") if n.strip()]:
+        try:
+            out.append(make_brain(n, s, skill))
+        except ReflexError as e:
+            console.print(f"[yellow]skipping {n}: {e}[/yellow]")
+    if not out:
+        raise ReflexError("no brains available")
+    seen = {}
+    for b in out:  # results are keyed by name
+        seen[b.name] = seen.get(b.name, 0) + 1
+        if seen[b.name] > 1:
+            b.name += f" #{seen[b.name]}"
+    return out
+
+
+@conveyor.command("sprites")
+def conveyor_sprites(
+    per_kind: int = typer.Option(5, help="images per object kind"),
+    quality: str = typer.Option("low", help="low | medium | high"),
+    force: bool = typer.Option(False, help="regenerate existing sprites"),
+):
+    """Generate object sprites with the OpenAI image model (REFLEX_IMAGE_MODEL) into data/sprites/."""
+    from .conveyor.sprites import generate
+
+    _guard("conveyor_sprites", None, lambda: generate(per_kind=per_kind, quality=quality, force=force))
+
+
+@conveyor.command("record")
+def conveyor_record(
+    out: Path = typer.Argument(Path("data/conveyor"), help="output folder (one mp4 per episode + ground_truth.json)"),
+    episodes: int = typer.Option(12),
+    seconds: float = typer.Option(60.0, help="seconds per episode"),
+    fps: float = typer.Option(10.0),
+    min_speed: float = typer.Option(0.1, help="m/s"),
+    max_speed: float = typer.Option(2.5, help="m/s"),
+    procedural: bool = typer.Option(False, help="use procedural shapes instead of sprites"),
+):
+    """Sample camera footage from the sim (varied speed/lighting/density) for `reflex ingest`."""
+    from .conveyor.engine import record
+
+    _guard("conveyor_record", None, lambda: record(out, _sprites(procedural), episodes=episodes, seconds=seconds,
+                                                   fps=fps, speed_range=(min_speed, max_speed)))
+
+
+@conveyor.command("live")
+def conveyor_live(
+    brains: str = typer.Option("vlm,decisions,student", help=BRAINS_HELP),
+    speed: float = typer.Option(0.2, help="initial belt speed, m/s"),
+    skill: Path = typer.Option(Path("skills/conveyor"), help="student skill folder"),
+    spec: Optional[Path] = typer.Option(None, help="spec/draft JSON for the API brains (default: the skill's)"),
+    port: int = typer.Option(8766),
+    seed: int = typer.Option(7),
+    cam_fps: float = typer.Option(30.0, help="camera frame rate (caps every brain)"),
+    procedural: bool = typer.Option(False),
+    no_open: bool = typer.Option(False, "--no-open"),
+    run: str = typer.Option("conveyor", "--run", help="run whose training stats the page footer shows"),
+):
+    """Identical belts side by side in the browser, one brain each, in real time."""
+    from .conveyor.live import Live, serve
+
+    load_env()
+    try:
+        from .utils import runs_dir
+
+        live = Live(_brains(brains, spec, skill), _sprites(procedural), speed_mps=speed, seed=seed, cam_fps=cam_fps,
+                    run=runs_dir() / run)
+    except ReflexError as e:
+        console.print(f"[red]ERROR:[/red] {e}")
+        raise typer.Exit(1)
+    serve(live, port=port, open_browser=not no_open)
+
+
+@conveyor.command("bench")
+def conveyor_bench(
+    brains: str = typer.Option("vlm,decisions,student", help=BRAINS_HELP),
+    speeds: str = typer.Option("0.2,0.4,0.8,1.6,3.2", help="belt speeds to sweep, m/s"),
+    objects: int = typer.Option(40, help="objects to score per speed"),
+    max_seconds: float = typer.Option(150.0, help="cap per speed"),
+    run: str = typer.Option("conveyor", "--run", help="results go to runs/<run>/conveyor_bench.*"),
+    skill: Path = typer.Option(Path("skills/conveyor")),
+    spec: Optional[Path] = typer.Option(None),
+    cam_fps: float = typer.Option(30.0),
+    procedural: bool = typer.Option(False),
+):
+    """Real-time speed sweep: max belt speed each brain sustains (recall and precision >= 0.9)."""
+    from .conveyor.engine import bench
+
+    def _bench():
+        sp = [float(s) for s in speeds.split(",")]
+        return bench(_brains(brains, spec, skill), _sprites(procedural), sp, objects=objects,
+                     max_seconds=max_seconds, out=run_dir(run, create=True), cam_fps=cam_fps)
+
+    _guard("conveyor_bench", run, _bench)
+
+
+@conveyor.command("score")
+def conveyor_score(
+    run: str = typer.Option("conveyor", "--run"),
+    data: Path = typer.Option(Path("data/conveyor"), help="folder with the sim's ground_truth.json"),
+):
+    """Teacher labels and student predictions vs the simulator's ground truth."""
+    from .conveyor.engine import score
+
+    _guard("conveyor_score", run, lambda: score(run_dir(run), data))
+
+
 if __name__ == "__main__":
     app()

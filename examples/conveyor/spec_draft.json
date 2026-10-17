@@ -1,0 +1,24 @@
+{
+  "query": "push plastic bottles off the recycling belt",
+  "task_summary": "Top-down camera over a recycling conveyor belt (dark rubber with vertical cleat lines). Two thin yellow lines across the belt mark the inspection zone. Mixed waste passes through: plastic bottles, glass bottles, cans, cardboard, paper, cartons and plastic bags.",
+  "visual_cues": [
+    "plastic bottles on this line: clear water bottles with a blue cap, dark brown cola bottles with a red label and red cap, green soda bottles with a white label, orange juice bottles with an orange cap, and crushed or crinkled clear bottles with a white cap",
+    "glass bottles on this line (answer no): olive-green wine bottle with a long neck and no label, brown beer bottle with a cream paper label, clear glass bottle with a metal cap, cobalt-blue bottle, small red hot-sauce bottle",
+    "colour alone does not decide it: brown and green plastic bottles exist; plastic bottles have a moulded rounded body, a plastic screw cap and often a wrap-around label",
+    "the object counts only if its centre is between the two yellow lines"
+  ],
+  "question": {
+    "type": "predicate",
+    "name": "plastic_bottle_in_zone",
+    "instructions": "Is there a plastic drink bottle (including dark cola bottles, green soda bottles, orange juice bottles and crushed bottles) whose centre lies between the two yellow lines? Answer no for glass bottles, cans, cartons, plastic bags, paper and cardboard, and for plastic bottles that are mostly outside the lines."
+  },
+  "edge_cases": [
+    "a plastic bottle half-way across a yellow line: yes only if more than half of it is between the lines",
+    "crushed plastic bottles still count",
+    "orange juice cartons and yoghurt pots are not bottles"
+  ],
+  "min_conf": 0.6,
+  "propagate_back": 0,
+  "hflip_ok": true,
+  "push_class": "yes"
+}

@@ -121,8 +121,9 @@ def spec_hash(spec: dict) -> str:
 
 
 def price_usd(input_tokens: float, output_tokens: float) -> float:
-    pin = float(os.environ.get("REFLEX_PRICE_IN_PER_M", "1.0"))
-    pout = float(os.environ.get("REFLEX_PRICE_OUT_PER_M", "4.0"))
+    # Decisions API (gpt-6-luna, public beta, Oct 2026): $0.10 / 1M input tokens, output not billed.
+    pin = float(os.environ.get("REFLEX_PRICE_IN_PER_M", "0.10"))
+    pout = float(os.environ.get("REFLEX_PRICE_OUT_PER_M", "0.0"))
     return input_tokens / 1e6 * pin + output_tokens / 1e6 * pout
 
 

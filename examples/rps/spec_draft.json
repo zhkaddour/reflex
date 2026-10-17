@@ -1,0 +1,46 @@
+{
+  "task_summary": "This image is a close crop around one hand, cut from a video of a person playing rock-paper-scissors. Classify which sign the hand is clearly showing.",
+  "visual_cues": [
+    "rock: closed fist, all four fingers curled into the palm (thumb may wrap across or rest alongside)",
+    "paper: open flat hand, all four fingers extended and visible (spread or together), any orientation",
+    "scissors: exactly two fingers (index + middle) extended, in a V or side by side, upright, sideways or pointing at the camera; the other fingers curled",
+    "none: anything that is not clearly one of the three: motion-blurred hand, half-formed shape, single pointing finger, relaxed hanging hand, hand mostly out of frame, or no hand (e.g. a face or shirt)"
+  ],
+  "question": {
+    "type": "choice",
+    "name": "sign",
+    "instructions": "The image is a crop around a hand. Which rock-paper-scissors sign is the hand CLEARLY showing right now? rock = closed fist with all fingers curled in. paper = open hand with all four fingers extended. scissors = only the index and middle fingers extended (V shape, side by side, or pointing toward the camera like a finger-gun with two fingers), other fingers curled. Answer none if the hand is motion-blurred so the fingers can't be counted, the shape is still forming, only ONE finger is extended, the hand is relaxed/hanging or pointing, most of the hand is cut off, or there is no hand. Count only the index, middle, ring and little fingers; the THUMB never matters (a thumb sticking up next to two extended fingers, like a two-finger 'finger gun', is still scissors). Judge only by which fingers are extended; ignore hand orientation, which hand (left/right), the person, and the background.",
+    "choices": [
+      {
+        "value": "rock",
+        "description": "Closed fist; no fingers extended (thumb position doesn't matter)"
+      },
+      {
+        "value": "paper",
+        "description": "Open hand; all four fingers extended, spread or together, any orientation"
+      },
+      {
+        "value": "scissors",
+        "description": "Index and middle fingers extended (V, side by side, or a two-finger 'finger gun'; any orientation; thumb ignored), ring and little fingers curled"
+      },
+      {
+        "value": "none",
+        "description": "Not clearly a sign: blur, mid-transition, one finger, relaxed/pointing hand, mostly out of frame, or no hand"
+      }
+    ]
+  },
+  "edge_cases": [
+    "Motion blur where the finger count can't be read: none",
+    "Hand in transition (fingers half-open or half-closed): none",
+    "Single index finger raised or pointing: none (not scissors)",
+    "Index + middle extended together with the thumb up (two-finger 'finger gun'): scissors",
+    "Two fingers extended but blurred or partly cut off at the crop edge: scissors only if both fingers are clearly separate from the fist",
+    "Thumb sticking out of a fist (thumbs-up-like): rock",
+    "Crop shows a face, shirt or arm with no readable hand: none"
+  ],
+  "min_conf": 0.6,
+  "propagate_back": 0,
+  "hflip_ok": true,
+  "background_class": "none",
+  "questions": []
+}

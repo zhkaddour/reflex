@@ -1,0 +1,70 @@
+{
+  "plan_source": "default",
+  "n_frames": 110,
+  "clean_agreement": 0.8364,
+  "results": [
+    {
+      "kind": "brightness",
+      "params": {
+        "factor": 0.5
+      },
+      "why": "dimmer venue lighting",
+      "student_agreement": 0.7545,
+      "student_drop": 0.0818
+    },
+    {
+      "kind": "motion_blur",
+      "params": {
+        "length": 15.0,
+        "angle": 0.0
+      },
+      "why": "fast movement",
+      "student_agreement": 0.8091,
+      "student_drop": 0.0273
+    },
+    {
+      "kind": "noise",
+      "params": {
+        "std": 20.0
+      },
+      "why": "cheap webcam sensor noise in low light",
+      "student_agreement": 0.6091,
+      "student_drop": 0.2273
+    },
+    {
+      "kind": "occlusion_patch",
+      "params": {
+        "size": 0.25
+      },
+      "why": "something partly in the way",
+      "student_agreement": 0.6909,
+      "student_drop": 0.1455
+    },
+    {
+      "kind": "rotation",
+      "params": {
+        "degrees": 10.0
+      },
+      "why": "camera mounted slightly differently",
+      "student_agreement": 0.5818,
+      "student_drop": 0.2545
+    },
+    {
+      "kind": "color_shift",
+      "params": {
+        "hue": 15.0,
+        "saturation": 1.0
+      },
+      "why": "different light colour",
+      "student_agreement": 0.8,
+      "student_drop": 0.0364
+    }
+  ],
+  "suggestions": [
+    "record with the camera tilted a few degrees (agreement drops 25% under rotation)",
+    "record in low light with the demo camera (agreement drops 23% under noise)",
+    "record with partial occlusions (hands, objects in the way) (agreement drops 15% under occlusion_patch)"
+  ],
+  "chart": "runs/plug/stress.png",
+  "examples": "runs/plug/stress_examples.png"
+}
