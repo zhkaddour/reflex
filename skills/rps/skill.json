@@ -1,0 +1,61 @@
+{
+  "name": "rps",
+  "classes": [
+    "rock",
+    "paper",
+    "scissors",
+    "none"
+  ],
+  "input_size": [
+    224,
+    224
+  ],
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "backbone": "mobilenetv3_small_100",
+  "spec": {
+    "name": "rps",
+    "query": "which of: rock, paper, scissors, none?",
+    "task_summary": "Classify the image into one of the given classes.",
+    "visual_cues": [],
+    "question": {
+      "type": "choice",
+      "name": "rps",
+      "instructions": "Which option best describes the image?",
+      "choices": [
+        {
+          "value": "rock",
+          "description": "rock"
+        },
+        {
+          "value": "paper",
+          "description": "paper"
+        },
+        {
+          "value": "scissors",
+          "description": "scissors"
+        },
+        {
+          "value": "none",
+          "description": "none"
+        }
+      ]
+    },
+    "edge_cases": [],
+    "min_conf": 0.6,
+    "propagate_back": 0,
+    "status": "ready"
+  },
+  "metrics": {},
+  "version": 1,
+  "created_at": "2026-10-17T12:42:41+00:00",
+  "dummy": true
+}
