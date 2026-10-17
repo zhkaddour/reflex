@@ -26,6 +26,8 @@ def create_backbone(name: str, pretrained: bool = True):
     model.eval()
     dc = timm.data.resolve_model_data_config(model)
     _, h, w = dc["input_size"]
+    if "img_size" in BACKBONES[name]["kwargs"]:  # timm's data config ignores the img_size override (DINOv2 says 518)
+        h = w = BACKBONES[name]["kwargs"]["img_size"]
     with torch.no_grad():
         dim = model(torch.zeros(1, 3, h, w)).shape[-1]
     return model, {"input_size": [h, w], "mean": list(dc["mean"]), "std": list(dc["std"]), "dim": int(dim)}
