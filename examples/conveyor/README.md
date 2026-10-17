@@ -78,6 +78,19 @@ is the same at 0.15 and 2.4 m/s because it is bounded by the camera's 30 fps, no
 Fast brains see each object ~10 times, so one bad frame becomes a false push: the student
 therefore needs 2 yes-votes per object (`student~k` to change it).
 
+## Demo day checklist
+
+- Close other heavy jobs (ingest, train, video calls): the page shows a "CPU busy" warning when load is high.
+- `reflex conveyor live` runs a preflight: sprites, skill (should say *Apple Neural Engine / GPU*), API key,
+  and one warm-up call per brain so the first answer on stage isn't slowed by connection setup.
+- Present full screen (`f`). Keys: `space` pause, `r` reset, `1`–`4` speed 0.2 / 0.5 / 1 / 2 m/s, `g` ramp
+  (+25% every 8 s until something breaks), `t` light/dark.
+- Suggested script: start at 0.2 m/s (all keep up, but look at $/hour), press `2` (0.5 m/s: GPT-5.5 falls
+  behind), press `4` (2 m/s: Decisions API slips, the student doesn't), then **turn wifi off**: both cloud lanes
+  show NO CONNECTION and bottles pass unsorted, while the offline student keeps sorting. Turn wifi back on and
+  the cloud lanes recover within seconds.
+- Costs while running (Oct 2026 list prices): GPT-5.5 ≈ $15/h, Decisions API ≈ $0.50/h, student $0.
+
 ## Knobs
 
 - `--brains vlm:4,decisions@gpt-6-sol,student~3`: `@model`, `:requests in flight`, `~yes-votes before pushing`
